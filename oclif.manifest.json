@@ -1,0 +1,241 @@
+{
+  "commands": {
+    "vlocity:inventory:all": {
+      "aliases": [],
+      "args": {},
+      "description": "Runs catalog, pricing, and apex inventory modules in parallel, writes manifest.json and summary-report.txt to the output directory.",
+      "examples": [
+        "<%= config.bin %> vlocity inventory all --target-org mySandbox",
+        "<%= config.bin %> vlocity inventory all --target-org mySandbox --output-dir ./output",
+        "<%= config.bin %> vlocity inventory all --target-org mySandbox --skip-apex",
+        "<%= config.bin %> vlocity inventory all --target-org mySandbox --json"
+      ],
+      "flags": {
+        "json": {
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "flags-dir": {
+          "helpGroup": "GLOBAL",
+          "name": "flags-dir",
+          "summary": "Import flag values from a directory.",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "target-org": {
+          "char": "o",
+          "name": "target-org",
+          "noCacheDefault": true,
+          "required": true,
+          "summary": "Org alias or username to target",
+          "hasDynamicHelp": true,
+          "multiple": false,
+          "type": "option"
+        },
+        "output-dir": {
+          "char": "d",
+          "name": "output-dir",
+          "summary": "Directory to write manifest.json and summary-report.txt",
+          "default": ".",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "skip-apex": {
+          "name": "skip-apex",
+          "summary": "Skip the Apex namespace scan (faster, use for large orgs on first pass)",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": true,
+      "hiddenAliases": [],
+      "id": "vlocity:inventory:all",
+      "pluginAlias": "@vlocity/inventory-plugin",
+      "pluginName": "@vlocity/inventory-plugin",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Run all Vlocity CMT inventory modules and output a manifest + summary report",
+      "enableJsonFlag": true,
+      "isESM": true,
+      "relativePath": [
+        "lib",
+        "commands",
+        "vlocity",
+        "inventory",
+        "all.js"
+      ]
+    },
+    "vlocity:inventory:apex": {
+      "aliases": [],
+      "args": {},
+      "description": "Uses the Tooling API to scan all custom (no-namespace) Apex classes and triggers for references to vlocity_cmt. Detects extends, implements, annotations, and direct field/method references.",
+      "examples": [
+        "<%= config.bin %> vlocity inventory apex --target-org mySandbox",
+        "<%= config.bin %> vlocity inventory apex --target-org mySandbox --json",
+        "<%= config.bin %> vlocity inventory apex --target-org mySandbox --show-lines"
+      ],
+      "flags": {
+        "json": {
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "flags-dir": {
+          "helpGroup": "GLOBAL",
+          "name": "flags-dir",
+          "summary": "Import flag values from a directory.",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "target-org": {
+          "char": "o",
+          "name": "target-org",
+          "noCacheDefault": true,
+          "required": true,
+          "summary": "Org alias or username to target",
+          "hasDynamicHelp": true,
+          "multiple": false,
+          "type": "option"
+        },
+        "show-lines": {
+          "name": "show-lines",
+          "summary": "Print the specific lines with vlocity_cmt references",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": true,
+      "hiddenAliases": [],
+      "id": "vlocity:inventory:apex",
+      "pluginAlias": "@vlocity/inventory-plugin",
+      "pluginName": "@vlocity/inventory-plugin",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Detect custom Apex that references the vlocity_cmt namespace",
+      "enableJsonFlag": true,
+      "isESM": true,
+      "relativePath": [
+        "lib",
+        "commands",
+        "vlocity",
+        "inventory",
+        "apex.js"
+      ]
+    },
+    "vlocity:inventory:catalog": {
+      "aliases": [],
+      "args": {},
+      "description": "Queries vlocity_cmt__Catalog__c and vlocity_cmt__CatalogRelationship__c to produce a catalog inventory with active/inactive counts and product linkage.",
+      "examples": [
+        "<%= config.bin %> vlocity inventory catalog --target-org mySandbox",
+        "<%= config.bin %> vlocity inventory catalog --target-org mySandbox --json"
+      ],
+      "flags": {
+        "json": {
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "flags-dir": {
+          "helpGroup": "GLOBAL",
+          "name": "flags-dir",
+          "summary": "Import flag values from a directory.",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "target-org": {
+          "char": "o",
+          "name": "target-org",
+          "noCacheDefault": true,
+          "required": true,
+          "summary": "Org alias or username to target",
+          "hasDynamicHelp": true,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": true,
+      "hiddenAliases": [],
+      "id": "vlocity:inventory:catalog",
+      "pluginAlias": "@vlocity/inventory-plugin",
+      "pluginName": "@vlocity/inventory-plugin",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Inventory Vlocity CMT catalogs in a sandbox",
+      "enableJsonFlag": true,
+      "isESM": true,
+      "relativePath": [
+        "lib",
+        "commands",
+        "vlocity",
+        "inventory",
+        "catalog.js"
+      ]
+    },
+    "vlocity:inventory:pricing": {
+      "aliases": [],
+      "args": {},
+      "description": "Queries vlocity_cmt__PricingPlan__c and vlocity_cmt__PriceList__c. Flags orphaned plans that have no linked products.",
+      "examples": [
+        "<%= config.bin %> vlocity inventory pricing --target-org mySandbox",
+        "<%= config.bin %> vlocity inventory pricing --target-org mySandbox --json"
+      ],
+      "flags": {
+        "json": {
+          "description": "Format output as json.",
+          "helpGroup": "GLOBAL",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "flags-dir": {
+          "helpGroup": "GLOBAL",
+          "name": "flags-dir",
+          "summary": "Import flag values from a directory.",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "target-org": {
+          "char": "o",
+          "name": "target-org",
+          "noCacheDefault": true,
+          "required": true,
+          "summary": "Org alias or username to target",
+          "hasDynamicHelp": true,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": true,
+      "hiddenAliases": [],
+      "id": "vlocity:inventory:pricing",
+      "pluginAlias": "@vlocity/inventory-plugin",
+      "pluginName": "@vlocity/inventory-plugin",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Inventory Vlocity CMT pricing plans and price lists",
+      "enableJsonFlag": true,
+      "isESM": true,
+      "relativePath": [
+        "lib",
+        "commands",
+        "vlocity",
+        "inventory",
+        "pricing.js"
+      ]
+    }
+  },
+  "version": "0.1.0"
+}
