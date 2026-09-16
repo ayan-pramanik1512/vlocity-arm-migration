@@ -12,6 +12,7 @@ import {inventoryValidationRules} from '../../../lib/validationrules.js'
 import {inventoryOmniStudio} from '../../../lib/omnistudio.js'
 import {inventoryUsageSignals} from '../../../lib/usagesignals.js'
 import {buildReport} from '../../../lib/report.js'
+import {buildHtmlReport} from '../../../lib/htmlReport.js'
 import {analyzeManifest, loadRulesConfig} from '../../../lib/analysis.js'
 import {InventoryManifest} from '../../../lib/types.js'
 
@@ -144,17 +145,21 @@ export default class VlocityInventoryAll extends SfCommand<InventoryManifest> {
 
     const manifestPath = path.join(outDir, 'manifest.json')
     const reportPath = path.join(outDir, 'summary-report.txt')
+    const htmlReportPath = path.join(outDir, 'summary-report.html')
 
     const rulesConfig = loadRulesConfig(flags['rules-config'])
     const analysis = analyzeManifest(manifest, rulesConfig)
     const report = buildReport(manifest, analysis)
+    const htmlReport = buildHtmlReport(manifest, analysis)
 
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
     fs.writeFileSync(reportPath, report)
+    fs.writeFileSync(htmlReportPath, htmlReport)
 
     this.log(`\nOutput written:`)
-    this.log(`  Manifest : ${manifestPath}`)
-    this.log(`  Report   : ${reportPath}`)
+    this.log(`  Manifest    : ${manifestPath}`)
+    this.log(`  Report      : ${reportPath}`)
+    this.log(`  HTML Report : ${htmlReportPath}`)
     this.log('\n' + report)
 
     return manifest

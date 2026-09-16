@@ -186,11 +186,11 @@ Scans all custom (non-namespaced) Apex classes and triggers via the Tooling API.
 
 ## Output files
 
-After running `vlocity inventory all`, two files are written to `--output-dir`:
+After running `vlocity inventory all`, three files are written to `--output-dir`:
 
 ### `summary-report.txt`
 
-A formatted plain-text report with sections for each module. Suitable for sharing as a pre-migration assessment document.
+A formatted plain-text report with sections for each module, plus an **Executive Summary** at the top (overall t-shirt size/sprint estimate, headline counts, and the top findings translated into plain business language). Suitable for sharing as a pre-migration assessment document.
 
 ```
 ========================================================================
@@ -199,6 +199,18 @@ A formatted plain-text report with sections for each module. Suitable for sharin
   Org         : https://myorg.sandbox.salesforce.com
   Org ID      : 00Dxx...
   Run Date    : 2026-07-16T11:20:42.669Z
+
+── EXECUTIVE SUMMARY ────────────────────────────────────────────────
+  Overall Migration Size : M  (2–4 sprints)
+
+  3 blocking issue(s) must be resolved before migration can proceed. Overall effort is estimated at M (2–4 sprints).
+
+  Products in Catalog             : 247
+  OmniStudio Components           : 81
+  Apex Files w/ vlocity_cmt Refs  : 631
+  Flows w/ vlocity_cmt Refs       : 22
+  Components Assessed             : 5
+  Blocking Findings               : 3
 
 ── CATALOG ──────────────────────────────────────────────────────────
   Total Catalogs  : 12
@@ -234,6 +246,16 @@ A formatted plain-text report with sections for each module. Suitable for sharin
   [!] 631 custom Apex file(s) reference vlocity_cmt — requires namespace update
   ...
 ```
+
+### `summary-report.html`
+
+A self-contained HTML version of the same assessment (no external dependencies — opens directly in any browser, safe to attach to an email or paste into a slide deck). Built for executive/stakeholder consumption rather than engineers:
+
+- Executive Summary card with the overall t-shirt size, sprint estimate, and headline stat tiles
+- Complexity distribution donut chart (LOW/MEDIUM/HIGH/CRITICAL across all scored components)
+- Estimated-effort-by-domain bar chart (Apex, Flows, OmniScripts, DataRaptors, FlexCards), color-coded by t-shirt size
+- Gap findings as severity-coded cards with plain-language framing and recommended actions
+- A detailed domain complexity table for engineers who want the underlying numbers
 
 ### `manifest.json`
 
@@ -372,7 +394,9 @@ vlocity-inventory/
 │       ├── attributes.ts       # Attribute/category inventory
 │       ├── catalog.ts          # Catalog inventory
 │       ├── connection.ts       # Org auth + queryAll helper
+│       ├── executiveSummary.ts # Shared exec-summary data builder (used by both report formats)
 │       ├── flows.ts            # Active Flow version scanner
+│       ├── htmlReport.ts       # Self-contained HTML report builder
 │       ├── omnistudio.ts       # OmniScript / DataRaptor / IP / FlexCard
 │       ├── pricing.ts          # Pricing plan + price list inventory
 │       ├── products.ts         # Product2 inventory
