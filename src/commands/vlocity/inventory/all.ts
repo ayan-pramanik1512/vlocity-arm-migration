@@ -12,6 +12,8 @@ import {inventoryValidationRules} from '../../../lib/validationrules.js'
 import {inventoryOmniStudio} from '../../../lib/omnistudio.js'
 import {inventoryUsageSignals} from '../../../lib/usagesignals.js'
 import {buildReport} from '../../../lib/report.js'
+import {buildHtmlReport} from '../../../lib/htmlReport.js'
+import {analyzeManifest, loadRulesConfig} from '../../../lib/analysis.js'
 import {InventoryManifest} from '../../../lib/types.js'
 
 export default class VlocityInventoryAll extends SfCommand<InventoryManifest> {
@@ -39,6 +41,12 @@ export default class VlocityInventoryAll extends SfCommand<InventoryManifest> {
     'skip-apex': Flags.boolean({
       summary: 'Skip the Apex namespace scan (faster, use for large orgs on first pass)',
       default: false,
+    }),
+    'rules-config': Flags.file({
+      summary: 'Path to migration-rules.config.json (defaults to ./migration-rules.config.json in CWD)',
+      char: 'r',
+      exists: true,
+      required: false,
     }),
   }
 
@@ -137,14 +145,22 @@ export default class VlocityInventoryAll extends SfCommand<InventoryManifest> {
 
     const manifestPath = path.join(outDir, 'manifest.json')
     const reportPath = path.join(outDir, 'summary-report.txt')
+    const htmlReportPath = path.join(outDir, 'summary-report.html')
+
+    const rulesConfig = loadRulesConfig(flags['rules-config'])
+    const analysis = analyzeManifest(manifest, rulesConfig)
+    const report = buildReport(manifest, analysis)
+    const htmlReport = buildHtmlReport(manifest, analysis)
 
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
-    fs.writeFileSync(reportPath, buildReport(manifest))
+    fs.writeFileSync(reportPath, report)
+    fs.writeFileSync(htmlReportPath, htmlReport)
 
     this.log(`\nOutput written:`)
-    this.log(`  Manifest : ${manifestPath}`)
-    this.log(`  Report   : ${reportPath}`)
-    this.log('\n' + buildReport(manifest))
+    this.log(`  Manifest    : ${manifestPath}`)
+    this.log(`  Report      : ${reportPath}`)
+    this.log(`  HTML Report : ${htmlReportPath}`)
+    this.log('\n' + report)
 
     return manifest
   }

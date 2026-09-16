@@ -1,0 +1,195 @@
+{
+  "_comment": "Vlocity → ARM migration rules config. Edit this file to adjust scoring weights, gap rules, and t-shirt thresholds without touching code.",
+  "complexity": {
+    "apex": {
+      "categoryWeights": {
+        "HookImplementation": 3,
+        "VlocityDefaultCustomization": 2,
+        "General": 1
+      },
+      "refTypeWeights": {
+        "extends": 3,
+        "implements": 3,
+        "direct_ref": 1,
+        "annotation": 1
+      },
+      "refCountBands": [
+        { "min": 0,   "max": 19,  "weight": 0 },
+        { "min": 20,  "max": 49,  "weight": 1 },
+        { "min": 50,  "max": 99,  "weight": 2 },
+        { "min": 100, "max": null, "weight": 3 }
+      ]
+    },
+    "flows": {
+      "processTypeWeights": {
+        "Workflow": 2,
+        "AutoLaunchedFlow": 1,
+        "Flow": 1,
+        "default": 1
+      },
+      "refCountBands": [
+        { "min": 0,   "max": 9,   "weight": 0 },
+        { "min": 10,  "max": 49,  "weight": 1 },
+        { "min": 50,  "max": null, "weight": 2 }
+      ]
+    },
+    "omniStudio": {
+      "componentTypeWeights": {
+        "OmniScript": 2,
+        "IntegrationProcedure": 2,
+        "DataRaptor": 1,
+        "FlexCard": 1,
+        "DocuSignTemplate": 1
+      },
+      "versionBands": [
+        { "min": 0,  "max": 2,   "weight": 0 },
+        { "min": 3,  "max": 5,   "weight": 1 },
+        { "min": 6,  "max": null, "weight": 2 }
+      ]
+    },
+    "tiers": [
+      { "label": "LOW",      "min": 0,  "max": 3  },
+      { "label": "MEDIUM",   "min": 4,  "max": 7  },
+      { "label": "HIGH",     "min": 8,  "max": 12 },
+      { "label": "CRITICAL", "min": 13, "max": null }
+    ]
+  },
+  "gapAnalysis": {
+    "rules": [
+      {
+        "id": "apex-extends-vlocity",
+        "title": "Apex Classes Extending Vlocity Types",
+        "severity": "CRITICAL",
+        "condition": { "metric": "apex.extendsCount", "op": "gt", "value": 0 },
+        "message": "{{apex.extendsCount}} class(es) extend vlocity_cmt types — base class will not exist in ARM",
+        "remediation": "Review each extended type against the ARM equivalent; inheritance must be replaced or removed"
+      },
+      {
+        "id": "hook-implementations",
+        "title": "Hook Implementations Require Remapping",
+        "severity": "CRITICAL",
+        "condition": { "metric": "apex.hookCount", "op": "gt", "value": 0 },
+        "message": "{{apex.hookCount}} HookImplementation class(es) — ARM uses different extension points",
+        "remediation": "Map each hook to the corresponding ARM extension interface before cut-over"
+      },
+      {
+        "id": "vlocity-customizations",
+        "title": "VlocityDefaultCustomization Classes",
+        "severity": "CRITICAL",
+        "condition": { "metric": "apex.customizationCount", "op": "gt", "value": 0 },
+        "message": "{{apex.customizationCount}} class(es) implement VlocityOpenInterface / Callable",
+        "remediation": "Remap to ARM-equivalent interfaces; validate all Callable keys remain valid in ARM"
+      },
+      {
+        "id": "apex-namespace-refs",
+        "title": "High Volume Apex Namespace References",
+        "severity": "HIGH",
+        "condition": { "metric": "apex.withVlocityRefs", "op": "gt", "value": 50 },
+        "message": "{{apex.withVlocityRefs}} custom Apex file(s) reference the vlocity_cmt namespace",
+        "remediation": "Batch-replace vlocity_cmt__ prefix after ARM deployment using IDE find-and-replace or a script"
+      },
+      {
+        "id": "flows-with-refs",
+        "title": "Flows Referencing vlocity_cmt Fields/Objects",
+        "severity": "HIGH",
+        "condition": { "metric": "flows.withVlocityRefs", "op": "gt", "value": 0 },
+        "message": "{{flows.withVlocityRefs}} flow(s) reference vlocity_cmt fields or objects",
+        "remediation": "Update field and object API names in each flow after namespace migration"
+      },
+      {
+        "id": "orphaned-pricing-plan",
+        "title": "Orphaned Pricing Plans",
+        "severity": "HIGH",
+        "condition": { "metric": "pricing.orphanedPlans", "op": "gt", "value": 0 },
+        "message": "{{pricing.orphanedPlans}} pricing plan(s) are not linked to any product",
+        "remediation": "Link plans to products or remove them — ARM import will reject orphaned plans"
+      },
+      {
+        "id": "apex-implements-vlocity",
+        "title": "Apex Classes Implementing Vlocity Interfaces",
+        "severity": "HIGH",
+        "condition": { "metric": "apex.implementsCount", "op": "gt", "value": 0 },
+        "message": "{{apex.implementsCount}} class(es) implement vlocity_cmt interfaces",
+        "remediation": "Review interface contracts; ARM may have renamed or restructured these interfaces"
+      },
+      {
+        "id": "missing-integration-procedures",
+        "title": "No Integration Procedures Found",
+        "severity": "MEDIUM",
+        "condition": { "metric": "omniStudio.totalIntegrationProcedures", "op": "eq", "value": 0 },
+        "message": "Zero Integration Procedures found — ARM relies on IPs for CPQ orchestration",
+        "remediation": "Verify whether IPs are managed in a separate package or need to be built from scratch"
+      },
+      {
+        "id": "inactive-products",
+        "title": "Inactive Products in Catalog",
+        "severity": "LOW",
+        "condition": { "metric": "products.inactive", "op": "gt", "value": 0 },
+        "message": "{{products.inactive}} inactive product(s) detected",
+        "remediation": "Confirm whether inactive products should be migrated or archived before migration"
+      },
+      {
+        "id": "inactive-catalogs",
+        "title": "Inactive Catalogs",
+        "severity": "LOW",
+        "condition": { "metric": "catalog.inactive", "op": "gt", "value": 0 },
+        "message": "{{catalog.inactive}} inactive catalog(s) detected",
+        "remediation": "Confirm whether inactive catalogs should be migrated; ARM import may reject inactive catalog refs"
+      }
+    ]
+  },
+  "tshirtSizing": {
+    "domains": [
+      {
+        "id": "apex-production",
+        "label": "Apex (Production)",
+        "countMetric": "apex.nonTestWithVlocityRefs",
+        "avgScoreMetric": "apex.avgProductionScore"
+      },
+      {
+        "id": "apex-test",
+        "label": "Apex (Test Classes)",
+        "countMetric": "apex.testWithVlocityRefs",
+        "avgScoreMetric": "apex.avgTestScore"
+      },
+      {
+        "id": "flows",
+        "label": "Flows",
+        "countMetric": "flows.withVlocityRefs",
+        "avgScoreMetric": "flows.avgScore"
+      },
+      {
+        "id": "omniscripts",
+        "label": "OmniScripts",
+        "countMetric": "omniStudio.totalOmniScripts",
+        "avgScoreMetric": "omniStudio.avgOmniScriptScore"
+      },
+      {
+        "id": "dataraptors",
+        "label": "DataRaptors",
+        "countMetric": "omniStudio.totalDataRaptors",
+        "avgScoreMetric": "omniStudio.avgDataRaptorScore"
+      },
+      {
+        "id": "flexcards",
+        "label": "FlexCards",
+        "countMetric": "omniStudio.totalFlexCards",
+        "avgScoreMetric": "omniStudio.avgFlexCardScore"
+      }
+    ],
+    "countBands": [
+      { "min": 0,   "max": 10,  "multiplier": 1 },
+      { "min": 11,  "max": 50,  "multiplier": 2 },
+      { "min": 51,  "max": 150, "multiplier": 3 },
+      { "min": 151, "max": 400, "multiplier": 4 },
+      { "min": 401, "max": null, "multiplier": 5 }
+    ],
+    "sizes": [
+      { "label": "XS", "min": 0,  "max": 4,    "sprintRange": "< 1 sprint"   },
+      { "label": "S",  "min": 5,  "max": 10,   "sprintRange": "1–2 sprints"  },
+      { "label": "M",  "min": 11, "max": 20,   "sprintRange": "2–4 sprints"  },
+      { "label": "L",  "min": 21, "max": 40,   "sprintRange": "4–8 sprints"  },
+      { "label": "XL", "min": 41, "max": null,  "sprintRange": "8+ sprints"   }
+    ]
+  }
+}
